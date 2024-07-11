@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .forms import ApplicationForm
 from .models import FormDatabase
 from django.contrib import messages
+from django.core.mail import EmailMessage
 from data_check import get_data
 
 
@@ -22,6 +23,11 @@ def index(request):
             else:
                 FormDatabase.objects.create(firstName=firstName, lastName=lastName,
                                             email=email, date=date, occupation=occupation)
+                messageBody = f"""Your job application has been submitted successfully with the following details:
+                                                Name: {firstName} {lastName}
+                                                Available date to join: {date}"""
+                emailMessage = EmailMessage("Your form has been submitted!", messageBody, to=[email])
+                emailMessage.send()
                 messages.success(request, f"{firstName}, your form was submitted successfully!")
 
     return render(request, 'index.html')
